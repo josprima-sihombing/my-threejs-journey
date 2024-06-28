@@ -1,42 +1,38 @@
 import "./style.css"
 import * as THREE from "three";
-import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
 
-const canvas = document.querySelector("canvas.three");
+const canvas = document.querySelector<HTMLElement>("canvas.three");
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, sizes.width/sizes.height);
+const camera = new THREE.PerspectiveCamera(45, sizes.width/sizes.height, 1, 100);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas! });
+const gridHelper = new THREE.GridHelper(20, 40);
 const axesHelper = new THREE.AxesHelper(5);
+const controls = new OrbitControls(camera, canvas!);
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ color: "green" });
 const box = new THREE.Mesh(boxGeometry, material);
-const box2 = new THREE.Mesh(boxGeometry, material);
 
-const boxGroup = new THREE.Group();
+camera.position.set(0, 2, 10);
+controls.enableDamping = true;
+controls.update();
 
-boxGroup.add(box, box2);
+box.position.y = 0.5;
 
-camera.position.z = 6;
-camera.position.x = 1;
-camera.position.y = 1;
-
-box2.position.y = 1.5;
-
-camera.lookAt(box.position);
-scene.add(boxGroup);
+scene.add(box);
+scene.add(gridHelper);
 scene.add(axesHelper);
 renderer.setSize(sizes.width, sizes.height);
 
-gsap.to(boxGroup.rotation, { y: Math.PI, duration: 2, repeat: -1, ease: "none" })
-
 const draw = () => {
   renderer.render(scene, camera);
+  controls.update();
   requestAnimationFrame(draw);
 };
 
