@@ -29,6 +29,28 @@ scene.add(box);
 scene.add(gridHelper);
 scene.add(axesHelper);
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  camera.aspect = sizes.width/sizes.height;
+  camera.updateProjectionMatrix()
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+});
+
+window.addEventListener("dblclick", () => {
+  const fullscreenElement = document.fullscreenElement;
+
+  if (fullscreenElement) {
+    document.exitFullscreen();
+    return
+  }
+
+  canvas?.requestFullscreen()
+})
 
 const draw = () => {
   renderer.render(scene, camera);
