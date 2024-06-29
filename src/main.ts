@@ -12,19 +12,36 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, sizes.width/sizes.height, 1, 100);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas! });
 const gridHelper = new THREE.GridHelper(20, 40);
-const axesHelper = new THREE.AxesHelper(5);
+const axesHelper = new THREE.AxesHelper(10);
 const controls = new OrbitControls(camera, canvas!);
 
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: "green" });
+const count = 5000;
+const customGeometry = new THREE.BufferGeometry();
+const positionsVertex = new Float32Array(count * 3 * 3);
+const positionAttribute = new THREE.BufferAttribute(positionsVertex, 3);
+
+for (let i=0;i<count * 3 * 3;i++) {
+  positionsVertex[i] = (Math.random() - 0.5) * 5
+}
+
+customGeometry.setAttribute("position", positionAttribute);
+
+const customMeshMaterial = new THREE.MeshBasicMaterial({ color: "green", wireframe: true });
+const customMesh = new THREE.Mesh(customGeometry, customMeshMaterial);
+
+customMesh.position.y = 2.5;
+
+const boxGeometry = new THREE.BoxGeometry(4, 4, 4);
+const material = new THREE.MeshBasicMaterial({ color: "red" });
 const box = new THREE.Mesh(boxGeometry, material);
 
-camera.position.set(0, 2, 10);
+box.position.set(-5, 2, 0);
+
+camera.position.set(0, 10, 20);
 controls.enableDamping = true;
 controls.update();
 
-box.position.y = 0.5;
-
+scene.add(customMesh);
 scene.add(box);
 scene.add(gridHelper);
 scene.add(axesHelper);
