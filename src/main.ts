@@ -1,6 +1,7 @@
 import "./style.css"
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import GUI from "lil-gui";
 
 const sizes = {
   width: window.innerWidth,
@@ -14,6 +15,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: canvas! });
 const gridHelper = new THREE.GridHelper(20, 40);
 const axesHelper = new THREE.AxesHelper(10);
 const controls = new OrbitControls(camera, canvas!);
+const gui = new GUI();
 
 const count = 5000;
 const customGeometry = new THREE.BufferGeometry();
@@ -31,15 +33,52 @@ const customMesh = new THREE.Mesh(customGeometry, customMeshMaterial);
 
 customMesh.position.y = 2.5;
 
-const boxGeometry = new THREE.BoxGeometry(4, 4, 4);
-const material = new THREE.MeshBasicMaterial({ color: "red" });
+customMesh.geometry.dispose();
+customMesh.visible = false;
+
+const globalProperties = {
+  color: "#ff0000",
+  segment: 1,
+};
+
+const boxGeometry = new THREE.BoxGeometry(4, 4, 4, globalProperties.segment, globalProperties.segment, globalProperties.segment);
+const material = new THREE.MeshBasicMaterial({ color: globalProperties.color });
 const box = new THREE.Mesh(boxGeometry, material);
 
-box.position.set(-5, 2, 0);
+box.position.set(0, 2, 0);
 
 camera.position.set(0, 10, 20);
 controls.enableDamping = true;
 controls.update();
+
+gui.title("Box controls");
+
+const positionGUI = gui.addFolder("Positions");
+const helperGUI = gui.addFolder("Helpers");
+
+positionGUI.close()
+helperGUI.close();
+
+positionGUI.add(box.position, "y").min(-10).max(10).step(0.01).name("elevation");
+positionGUI.add(box.position, "x").min(-10).max(10).step(0.01).name("x axis");
+positionGUI.add(box.position, "z").min(-10).max(10).step(0.01).name("z axis");
+
+gui.addColor(globalProperties, "color").onChange((value: THREE.Color) => {
+  box.material.color.set(value)
+})
+
+gui.add(material, "wireframe")
+gui.add(globalProperties, "segment")
+  .min(1)
+  .max(20)
+  .step(1)
+  .onFinishChange((value: number) => {
+    box.geometry.dispose();
+    box.geometry = new THREE.BoxGeometry(4, 4, 4, value, value, value)
+  });
+
+helperGUI.add(axesHelper, "visible").name("axes helper")
+helperGUI.add(gridHelper, "visible").name("grid helper")
 
 scene.add(customMesh);
 scene.add(box);
