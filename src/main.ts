@@ -15,7 +15,7 @@ const camera = new THREE.PerspectiveCamera(45, sizes.width/sizes.height, 1, 100)
 const renderer = new THREE.WebGLRenderer({ canvas: canvas! });
 const gridHelper = new THREE.GridHelper(20, 40);
 const axesHelper = new THREE.AxesHelper(10);
-const controls = new OrbitControls(camera, canvas!);
+// const controls = new OrbitControls(camera, canvas!);
 const gui = new GUI();
 
 const count = 5000;
@@ -50,10 +50,11 @@ const box = new THREE.Mesh(boxGeometry, material);
 box.position.set(0, 2, 0);
 
 camera.position.y = 4
-camera.position.z = 8
+camera.position.z = 10
+camera.lookAt(new THREE.Vector3())
 
-controls.enableDamping = true;
-controls.update();
+// controls.enableDamping = true;
+// controls.update();
 
 gui.title("Box controls");
 
@@ -86,7 +87,7 @@ helperGUI.add(gridHelper, "visible").name("grid helper")
 scene.add(customMesh);
 // scene.add(box);
 // scene.add(gridHelper);
-scene.add(axesHelper);
+// scene.add(axesHelper);
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
 
@@ -170,7 +171,7 @@ wallBehind.position.z = -1.5 - 0.05/2
  */
 const houseGroup = new THREE.Group();
 
-houseGroup.add(base, wallLeft, wallBehind);
+houseGroup.add(base, floor, wallLeft, wallBehind);
 houseGroup.rotation.y = -Math.PI / 4
 scene.add(houseGroup)
 
@@ -200,7 +201,7 @@ pointLight.position.x = 0
 pointLight.position.y = 3
 pointLight.position.z = 0
 scene.add(pointLight)
-scene.add(pointLightHelper)
+// scene.add(pointLightHelper)
 
 gui.add(globalProperties, "wireframe").onChange((value: boolean) => {
   floorMaterial.wireframe = value
@@ -229,9 +230,14 @@ window.addEventListener("dblclick", () => {
   canvas?.requestFullscreen()
 })
 
+window.addEventListener("mousemove", (event) => {
+  houseGroup.rotation.y = ((((event.clientX - sizes.width / 2)/sizes.width / 2) * Math.PI / 2)) - Math.PI / 4
+  houseGroup.rotation.x = -(((event.clientY - sizes.height / 2)/sizes.height / 2) * Math.PI / 2)
+})
+
 const draw = () => {
   renderer.render(scene, camera);
-  controls.update();
+  // controls.update();
   requestAnimationFrame(draw);
 };
 
